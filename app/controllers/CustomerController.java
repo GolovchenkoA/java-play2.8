@@ -2,7 +2,6 @@ package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
-import com.typesafe.config.Config;
 import interceptors.annotations.Catch;
 import models.Customer;
 import models.CustomerBuilder;
@@ -11,38 +10,35 @@ import play.libs.Json;
 import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.Controller;
 import play.mvc.Result;
+import store.CustomerStore;
 
-import java.util.Map;
-import java.util.Random;
+import javax.inject.Singleton;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 
-import static java.lang.Thread.sleep;
-
+@Singleton
 @Catch
 public class CustomerController extends Controller {
-
-    @Inject
-    HttpExecutionContext ec;
 
     final Logger.ALogger log = Logger.of("application");
 
     private static final CustomerBuilder builder = new CustomerBuilder();
-    private static final AtomicLong idGen = new AtomicLong(1);
-    private static final Map<Long, Customer> customers = new ConcurrentHashMap<>();
+    private static final Function<? super Customer, Result> getResponseCode = customer -> customer !=  null ? created(): badRequest();
 
-    private  static final Function<? super Customer, Result> getResponseCode = customer -> customer !=  null ? created(): badRequest();
-    private static final Random r = new Random();
-
-    private final Config config;
+    private final HttpExecutionContext ec;
+    private final CustomerStore customerStore;
 
     @Inject
-    public CustomerController(Config config) {
-        this.config = config;
+    public CustomerController(CustomerStore customerStore, HttpExecutionContext ec) {
+        this.customerStore = customerStore;
+        this.ec = ec;
+    }
+
+    public Result index() {
+        return ok(views.html.index.render());
     }
 
     public Result params(String param1, String param2) {
@@ -53,7 +49,7 @@ public class CustomerController extends Controller {
     public CompletionStage<Result> exists(long id) {
 
         return CompletableFuture.supplyAsync(() -> {
-            return customers.get(id) != null
+            return customerStore.get(id) != null
                     ? ok("exists") : ok("not exists");
         }, ec.current());
     }
@@ -61,11 +57,9 @@ public class CustomerController extends Controller {
     public CompletionStage<Result> create(String name) {
 
         return CompletableFuture.supplyAsync(() -> {
-            Customer customer = builder.setId(idGen.getAndIncrement())
-                            .setName(name)
-                            .build();
+            Customer customer = builder.setName(name).build();
 
-            customers.put(customer.getId(), customer);
+            customerStore.updateOrCreate(customer);
             Logger.info("created1");
             log.info("Customer created2: " + customer.getId());
             log.debug("Customer created2 (debug): " + customer.getId());
@@ -79,23 +73,7 @@ public class CustomerController extends Controller {
 
         CompletableFuture<Result> future = CompletableFuture.supplyAsync(() -> {
 
-            Customer customer = customers.get(id);
-
-
-
-            if (r.nextInt(3) % 2 == 0) {
-                try {
-                    log.info("wait for id: " + id);
-                    sleep(500);
-                    log.info("wait for id finished: " + id);
-
-                    //if (customer != null) {
-                        customer.setTookTime("50");
-                   // }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+            Customer customer = customerStore.get(id);
 
             if (customer == null) {
                 return notFound();

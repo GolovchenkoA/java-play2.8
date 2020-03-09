@@ -7,10 +7,16 @@ GET     /                           controllers.HomeController.index
 GET     /api/:version/:param        controllers.BaseAPIController.get(version:String, param: String)
 GET     /api                        controllers.BaseAPIController.get1
 
+# Api
 GET     /customer/:id                controllers.CustomerController.get(id: Long)
 GET     /customer/exists/:id                controllers.CustomerController.exists(id: Long)
 GET     /customer/create/:name                controllers.CustomerController.create(name: String)
-GET     /customer                controllers.CustomerController.params(param1: String ?= "", param2: String ?= "")
+#GET     /customer                controllers.CustomerController.params(param1: String ?= "", param2: String ?= "")
+
+#Forms API
+GET     /customer              controllers.CustomerViewController.all(request: Request)
+GET     /customer/create/               controllers.CustomerViewController.createCustomer(request: Request)
+GET     /customer/new/                controllers.CustomerViewController.newCustomer(request: Request)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

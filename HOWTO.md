@@ -1,4 +1,6 @@
 
+Tutorials: https://www.playframework.com/documentation/2.8.x/Tutorials
+
 1. Create zip file from sbt console
 dist
 2. Copy to external directory

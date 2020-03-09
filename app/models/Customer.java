@@ -5,7 +5,8 @@ public class Customer {
     private long id;
     private String name;
     private long spend;
-    private String tookTime;
+
+    public Customer() { }
 
     public Customer(long id, String name, long spend) {
         this.id = id;
@@ -25,7 +26,15 @@ public class Customer {
         return spend;
     }
 
-    public void setTookTime(String tookTime) {
-        this.tookTime = tookTime;
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSpend(long spend) {
+        this.spend = spend;
     }
 }

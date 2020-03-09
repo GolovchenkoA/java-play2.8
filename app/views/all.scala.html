@@ -1,0 +1,55 @@
+@import java.util
+@import play.mvc.Http.Request
+@(customers: Seq[Customer], customerForm: Form[Customer])(implicit request: Request, messages: play.i18n.Messages)
+@main("Counters") {
+
+    <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Hello</title>
+                <!-- downloaded from https://getbootstrap.com/ . Full path: app/public/bootstrap/css/bootstrap.min.css-->
+            <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("bootstrap/css/bootstrap.min.css")">
+
+        </head>
+
+
+        @helper.form(routes.CustomerViewController.createCustomer) {
+            @helper.CSRF.formField
+            @helper.inputText(customerForm("spend"))
+            @helper.inputText(customerForm("name"))
+            @helper.inputText(customerForm("email"))
+            <button type="submit" class="btn btn-primary">Create </button>
+        }
+
+        @* Global errors are not tied to any particular form field *@
+        @if(customerForm.hasGlobalErrors) {
+            @customerForm.globalErrors.asScala.map { error: play.data.validation.ValidationError =>
+                <div>
+                    @error.key: @error.message
+                </div>
+            }
+        }
+
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>name</th>
+                    <th>spent</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            @for(customer: Customer <- customers) {
+                <tr>
+                    <td>@customer.getId</td>
+                    <td>@customer.getName</td>
+                    <td>@customer.getSpend</td>
+                </tr>
+            }
+</tbody>
+</table>
+
+</html>
+}
