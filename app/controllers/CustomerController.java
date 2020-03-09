@@ -24,13 +24,12 @@ import java.util.function.Function;
 
 import static java.lang.Thread.sleep;
 
-
+@With(CatchAction.class)
 public class CustomerController extends Controller {
 
     @Inject
     HttpExecutionContext ec;
 
-    //final Logger.ALogger log = Logger.of("play");
     final Logger.ALogger log = Logger.of("application");
 
     private static final CustomerBuilder builder = new CustomerBuilder();

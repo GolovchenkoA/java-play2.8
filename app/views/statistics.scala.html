@@ -1,0 +1,35 @@
+@import java.util.concurrent.atomic.AtomicInteger
+
+@(counters: Map[String, AtomicInteger])
+@main("Counters") {
+
+    <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Hello</title>
+            <!-- downloaded from https://getbootstrap.com/ . Full path: app/public/bootstrap/css/bootstrap.min.css-->
+            <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("bootstrap/css/bootstrap.min.css")">
+
+        </head>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Count</th>
+                    <th>Request</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            @for((req: String, count: AtomicInteger) <- counters) {
+                <tr>
+                    <td>@count.get()</td>
+                    <td>@req</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+
+    </html>
+
+}
