@@ -3,7 +3,7 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import com.typesafe.config.Config;
-import interceptors.CatchAction;
+import interceptors.annotations.Catch;
 import models.Customer;
 import models.CustomerBuilder;
 import play.Logger;
@@ -11,7 +11,6 @@ import play.libs.Json;
 import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.Controller;
 import play.mvc.Result;
-import play.mvc.With;
 
 import java.util.Map;
 import java.util.Random;
@@ -24,7 +23,7 @@ import java.util.function.Function;
 
 import static java.lang.Thread.sleep;
 
-@With(CatchAction.class)
+@Catch
 public class CustomerController extends Controller {
 
     @Inject
